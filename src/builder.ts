@@ -1,7 +1,11 @@
-import assert from 'assert';
+import assert from 'node:assert';
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 import { promisify } from 'node:util';
+
+const width = 360;
+const height = 180;
+const COMPRESSION_LEVEL = 5; // default quality is 11, which is too slow
 
 // https://neo.gsfc.nasa.gov/view.php?datasetId=AURA_UVI_CLIM_M
 // Jan to Dec
@@ -20,10 +24,6 @@ const months = [
   'https://neo.gsfc.nasa.gov/servlet/RenderData?si=1582435&cs=rgb&format=CSV&width=360&height=180',
 ]
 
-const width = 360;
-const height = 180;
-const COMPRESSION_LEVEL = 5; // default quality is 11, which is too slow
-
 const download = async (url: string) => {
   const response = await fetch(url)
   const text = await response.text()
@@ -38,10 +38,9 @@ const toGrid = (text: string) => {
   return grid;
 }
 
-const encode = (grid: number[][]) => {
-  const buffer = Buffer.alloc(width * height * 2)
+const encode = (cells: number[]) => {
+  const buffer = Buffer.alloc(cells.length * 2)
 
-  const cells = grid.flat()
   for (let i = 0; i < cells.length; i++) {
     // Storing float with 2 decimal places as uint16
     buffer.writeUInt16BE(Math.round(cells[i] * 100), i * 2)
@@ -50,39 +49,28 @@ const encode = (grid: number[][]) => {
   return buffer
 }
 
-const load = (month: number) => {
-  return fs.readFileSync(`./data-${month}.bin`)
-}
-
-const lookup = (grid: Buffer, lat: number, lon: number) => {
-  const index = Math.floor((90 - lat) * width + (180 - lon));
-  const cell = grid.readUInt16BE(index * 2) / 100
-  return cell;
-}
-
-
-const compress = promisify(zlib.brotliCompress);
-const decompress = promisify(zlib.brotliDecompress);
-
 const main = async () => {
-  // const grid = load(0);
-  // const [lat, lon] = [-33.86785, 151.20732];
+  const sequence: number[] = [];
 
   for (let i = 0; i < months.length; i++) {
+    console.log(`Downloading ${i + 1}/${months.length}`)
     const month = months[i]
     const text = await download(month)
     const grid = toGrid(text);
-
-    const buffer = encode(grid);
-    const zipped = await compress(buffer, {
-      params: {
-        [zlib.constants.BROTLI_PARAM_QUALITY]: COMPRESSION_LEVEL,
-      },
-    });
-
-    // fs.writeFileSync(`resources/data-${i}.bin`, buffer);
-    fs.writeFileSync(`resources/data-${i}.bin.br`, zipped);
+    sequence.push(...grid.flat())
   }
+
+  assert.equal(sequence.length, width * height * 12, 'Invalid length')
+  const buffer = encode(sequence);
+  const compress = promisify(zlib.brotliCompress);
+  const zipped = await compress(buffer, {
+    params: {
+      [zlib.constants.BROTLI_PARAM_QUALITY]: COMPRESSION_LEVEL,
+    },
+  });
+
+  fs.writeFileSync(`resources/data.br`, zipped);
+  console.log('Saved to resources/data.br, size = %d bytes', zipped.length)
 }
 
 main()
