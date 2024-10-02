@@ -9,7 +9,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "builder": "tsx src/builder.ts",
+    "grabber": "tsx src/grabber.ts",
     "format": "prettier --write .",
     "test": "TZ=UTC NODE_ENV=test vitest",
     "semantic-release": "semantic-release"
