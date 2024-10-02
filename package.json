@@ -1,0 +1,41 @@
+{
+  "name": "uv-index",
+  "version": "0.0.0-development",
+  "description": "Global UV Index",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "builder": "tsx src/builder.ts",
+    "format": "prettier --write .",
+    "test": "TZ=UTC NODE_ENV=test vitest",
+    "semantic-release": "semantic-release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/runk/uv-index.git"
+  },
+  "keywords": [
+    "UV",
+    "UV Index",
+    "Ultraviolet",
+    "UV radiation"
+  ],
+  "author": "Dmitry Shirokov <deadrunk@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/runk/uv-index/issues"
+  },
+  "homepage": "https://github.com/runk/uv-index#readme",
+  "engines": {
+    "node": ">=14 <15 || >=16 <17 || >=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  }
+}
