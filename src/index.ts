@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import zlib from 'node:zlib';
 import { promisify } from 'node:util';
 import assert from 'node:assert';
+import path from 'node:path';
 
 const decompress = promisify(zlib.brotliDecompress);
 
@@ -9,6 +10,7 @@ const WIDTH = 360;
 const HEIGHT = 180;
 const CELL_SIZE = 2;
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const DATA_FILE = path.resolve(import.meta.dirname, '../resources/data.br');
 
 const round = (num: number, decimalPlaces: number = 2) => {
   var p = Math.pow(10, decimalPlaces || 0);
@@ -17,7 +19,7 @@ const round = (num: number, decimalPlaces: number = 2) => {
 };
 
 export default async () => {
-  const deflated = await fs.readFile('resources/data.br');
+  const deflated = await fs.readFile(DATA_FILE);
   const data = await decompress(deflated);
   assert.equal(data.length, WIDTH * HEIGHT * 12 * CELL_SIZE);
 
