@@ -11,7 +11,8 @@ const WIDTH = 360;
 const HEIGHT = 180;
 const CELL_SIZE = 2;
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const DATA_FILE = process.env.UV_INDEX_DATA || path.resolve(import.meta.dirname, '../resources/data.br');
+const DATA_DIR = process.env.UV_INDEX_DATA_DIR || path.resolve(import.meta.dirname, '../resources');
+const DATA_FILE = path.join(DATA_DIR, 'data.br');
 
 const round = (num: number, decimalPlaces: number = 2) => {
   var p = Math.pow(10, decimalPlaces || 0);
