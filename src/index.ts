@@ -3,6 +3,7 @@ import zlib from 'node:zlib';
 import { promisify } from 'node:util';
 import assert from 'node:assert';
 import path from 'node:path';
+import process from 'node:process';
 
 const decompress = promisify(zlib.brotliDecompress);
 
@@ -10,7 +11,7 @@ const WIDTH = 360;
 const HEIGHT = 180;
 const CELL_SIZE = 2;
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const DATA_FILE = path.resolve(import.meta.dirname, '../resources/data.br');
+const DATA_FILE = process.env.UV_INDEX_DATA || path.resolve(import.meta.dirname, '../resources/data.br');
 
 const round = (num: number, decimalPlaces: number = 2) => {
   var p = Math.pow(10, decimalPlaces || 0);
